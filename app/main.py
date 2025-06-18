@@ -39,14 +39,24 @@ def generate_answer(query):
     context = retrieve_context(query)
     if not context:
         return "ไม่พบข้อมูลที่เกี่ยวข้อง"
-    prompt = f"""
-เนื้อหาประกอบ:
-{chr(10).join(context)}
 
-คำถาม: {query}
-ตอบ:
-"""
-    return generate_answer_from_prompt(prompt)
+    # รวม context เป็นข้อความเดียว แยกบรรทัดด้วย \n
+    context_text = "\n".join(context)
+
+    prompt = f"""
+            คุณเป็นผู้ช่วยที่เชี่ยวชาญและผู้ช่วยเหลือ กรุณาตอบคำถามโดยอิงจากเนื้อหาต่อไปนี้:
+            
+            เนื้อหาประกอบ:
+            {context_text}
+            
+            คำถาม: {query}
+            คำตอบ:
+            """
+
+    answer = generate_answer_from_prompt(prompt).strip()
+    if not answer:
+        return "ไม่สามารถให้คำตอบได้ในขณะนี้"
+    return answer
 
 @app.get("/chat")
 def chat(query: str):
