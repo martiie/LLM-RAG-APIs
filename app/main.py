@@ -41,19 +41,28 @@ history = []
 def generate_answer(query):
     global history
 
-    context = retrieve_context(query)
-    if not context:
-        return "ไม่พบข้อมูลที่เกี่ยวข้อง"
-
-    context_text = "\n".join(context)
-
     # สร้างข้อความประวัติเป็น string
     history_text = ""
     for i, (q, a) in enumerate(history[-5:], 1):
         history_text += f"คำถาม {i}: {q}\nคำตอบ {i}: {a}\n"
 
+    context = retrieve_context(query)
+        
+    if not context:
+        prompt = f"""
+            คุณเป็นผู้ช่วยที่เชี่ยวชาญ ชื่อ"นิตยา"(ผู้หญิง) กรุณาตอบคำถามโดยอิงจากประวัติคำถาม-คำตอบก่อนหน้า*ถ้า*เกี่ยวข้องกับคำถามล่าสุด
+            ประวัติคำถาม-คำตอบ:
+            {history_text}
+            
+            คำถามใหม่: {query}
+            คำตอบ:
+            """
+        return generate_answer_from_prompt(prompt).strip()
+
+    context_text = "\n".join(context)
+
     prompt = f"""
-            คุณเป็นผู้ช่วยที่เชี่ยวชาญ กรุณาตอบคำถามโดยอิงจากเนื้อหาต่อไปนี้และประวัติคำถาม-คำตอบก่อนหน้าที่เกี่ยวข้องกับคำถามล่าสุด
+            คุณเป็นผู้ช่วยที่เชี่ยวชาญ ชื่อ"นิตยา"(ผู้หญิง) กรุณาตอบคำถามโดยอิงจากเนื้อหาต่อไปนี้และประวัติคำถาม-คำตอบก่อนหน้า*ถ้า*เกี่ยวข้องกับคำถามล่าสุด
             
             ประวัติคำถาม-คำตอบ:
             {history_text}
@@ -74,6 +83,11 @@ def generate_answer(query):
 
     return answer
 
+@app.post("/")
+def clear_history():
+    global history
+    history = [] 
+    return {"message": "ล้างประวัติคำถามเรียบร้อยแล้ว"}
 
 @app.get("/chat")
 def chat(query: str):
