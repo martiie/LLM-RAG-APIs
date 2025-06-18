@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+
+# virtualenv
+venv/
+.env/
+
+# VS Code
+.vscode/
+
+# Docker
+*.log
+docker-compose.override.yml
+*.pid
+*.sock
+
+# Temp files
+*.swp
+*~
+
+# Temp folders
+temp/
+tmp/
+
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
