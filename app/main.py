@@ -35,28 +35,45 @@ def retrieve_context(query, top_k=3):
     _, indices = faiss_indexer.search(query_vec, top_k)
     return [documents[i]["content"] for i in indices[0]]
 
+# เก็บประวัติคำถาม-คำตอบล่าสุด 5 คู่
+history = []
+
 def generate_answer(query):
+    global history
+
     context = retrieve_context(query)
     if not context:
         return "ไม่พบข้อมูลที่เกี่ยวข้อง"
 
-    # รวม context เป็นข้อความเดียว แยกบรรทัดด้วย \n
     context_text = "\n".join(context)
 
+    # สร้างข้อความประวัติเป็น string
+    history_text = ""
+    for i, (q, a) in enumerate(history[-5:], 1):
+        history_text += f"คำถาม {i}: {q}\nคำตอบ {i}: {a}\n"
+
     prompt = f"""
-            คุณเป็นผู้ช่วยที่เชี่ยวชาญและผู้ช่วยเหลือ กรุณาตอบคำถามโดยอิงจากเนื้อหาต่อไปนี้:
+            คุณเป็นผู้ช่วยที่เชี่ยวชาญ กรุณาตอบคำถามโดยอิงจากเนื้อหาต่อไปนี้และประวัติคำถาม-คำตอบก่อนหน้าที่เกี่ยวข้องกับคำถามล่าสุด
+            
+            ประวัติคำถาม-คำตอบ:
+            {history_text}
             
             เนื้อหาประกอบ:
             {context_text}
             
-            คำถาม: {query}
+            คำถามใหม่: {query}
             คำตอบ:
             """
 
     answer = generate_answer_from_prompt(prompt).strip()
     if not answer:
         return "ไม่สามารถให้คำตอบได้ในขณะนี้"
+
+    # บันทึกคำถาม-คำตอบล่าสุดลง history
+    history.append((query, answer))
+
     return answer
+
 
 @app.get("/chat")
 def chat(query: str):
