@@ -3,7 +3,7 @@ import os
 from app.config import DOCS_JSON
 
 def load_docs():
-    if os.path.exists(DOCS_JSON):
+    if os.path.exists(DOCS_JSON) and os.path.getsize(DOCS_JSON) > 0:
         with open(DOCS_JSON, encoding="utf-8") as f:
             return json.load(f)
     return []
