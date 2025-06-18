@@ -1,5 +1,8 @@
 from sentence_transformers import SentenceTransformer
 from app.config import EMBED_MODEL_NAME
+import os
+os.environ['TRANSFORMERS_CACHE'] = '/tmp/transformers'
+os.environ['SENTENCE_TRANSFORMERS_HOME'] = '/tmp/sentence_transformers'
 
 embed_model = SentenceTransformer(EMBED_MODEL_NAME)
 
