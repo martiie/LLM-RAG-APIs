@@ -1,6 +1,5 @@
 ---
 title: LLM RAG API
-emoji: 🧠
 colorFrom: indigo
 colorTo: pink
 sdk: docker
